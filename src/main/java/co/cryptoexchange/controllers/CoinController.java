@@ -27,9 +27,10 @@ public class CoinController {
     @PostMapping({"", "/"})
     public ResponseEntity addCoin(@RequestBody CoinDTO coinDTO){
         Coin coin = CoinConverter.convertToCoin(coinDTO);
-        coinService.addCoin(coin);
+        ResponseEntity response = (coinService.addCoin(coin) != null) ? new ResponseEntity(HttpStatus.CREATED) :
+                new ResponseEntity(HttpStatus.BAD_REQUEST);
 
-        return new ResponseEntity(HttpStatus.CREATED);
+        return response;
     }
 
 }

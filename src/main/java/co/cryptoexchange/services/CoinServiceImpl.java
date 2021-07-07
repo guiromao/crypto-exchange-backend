@@ -20,6 +20,14 @@ public class CoinServiceImpl implements CoinService {
 
     @Override
     public Coin addCoin(Coin coin) {
+        List<Coin> allCoins = retrieveCoins();
+
+        for(Coin searchCoin: allCoins){
+            if(coin.getCode().toUpperCase().trim().equals(searchCoin.getCode().toUpperCase().trim())){
+                return null;
+            }
+        }
+
         return coinRepository.saveAndFlush(coin);
     }
 }
