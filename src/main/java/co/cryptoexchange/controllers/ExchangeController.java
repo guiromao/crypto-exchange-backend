@@ -1,5 +1,7 @@
 package co.cryptoexchange.controllers;
 
+import co.cryptoexchange.model.Coin;
+import co.cryptoexchange.model.CoinOwnership;
 import co.cryptoexchange.model.Exchange;
 import co.cryptoexchange.model.converters.ExchangeConverter;
 import co.cryptoexchange.model.dto.ExchangeDTO;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import co.cryptoexchange.services.ExchangeService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping(path = {"/v1/api/exchanges/", "/v1/api/exchanges"})
@@ -31,6 +35,28 @@ public class ExchangeController {
         exchangeService.saveExchange(exchange);
 
         return new ResponseEntity(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}/buy")
+    public ResponseEntity buyCoins(@PathVariable Long id, @RequestParam String code, @RequestParam Double amount){
+        ResponseEntity response = exchangeService.processCoinsBuy(id, code, amount) ?
+                new ResponseEntity(HttpStatus.OK) : new ResponseEntity(HttpStatus.BAD_REQUEST);
+
+        return response;
+    }
+
+    @GetMapping("/{id}/wallet")
+    public ResponseEntity<List<CoinOwnership>> getExchangeCoins(@PathVariable Long id){
+        List<CoinOwnership> coins = exchangeService.retrieveCoins(id);
+
+        return new ResponseEntity<>(coins, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deleteExchange(@PathVariable Long id){
+        exchangeService.deleteExchange(id);
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 
 }

@@ -19,15 +19,18 @@ public class CoinServiceImpl implements CoinService {
     }
 
     @Override
-    public Coin addCoin(Coin coin) {
-        List<Coin> allCoins = retrieveCoins();
-
-        for(Coin searchCoin: allCoins){
-            if(coin.getCode().toUpperCase().trim().equals(searchCoin.getCode().toUpperCase().trim())){
-                return null;
-            }
-        }
-
+    public Coin saveCoin(Coin coin) {
         return coinRepository.saveAndFlush(coin);
     }
+
+    @Override
+    public Coin getCoin(Long id) {
+        return coinRepository.getById(id);
+    }
+
+    @Override
+    public void deleteCoin(Long id) {
+        coinRepository.deleteById(id);
+    }
+
 }

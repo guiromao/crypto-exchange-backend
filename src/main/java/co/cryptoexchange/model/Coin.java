@@ -9,15 +9,15 @@ import java.util.Set;
 public class Coin {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long coinId;
 
     private String code;
     private String name;
     private Double value;
 
-    @OneToMany(mappedBy = "coin")
-    private Set<CoinOwnership> ownerships;
+    /*@OneToMany(mappedBy = "coin", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<CoinOwnership> ownerships;*/
 
     public Coin(){
 
@@ -27,7 +27,7 @@ public class Coin {
         this.code = code;
         this.name = name;
         this.value = value;
-        ownerships = new HashSet<>();
+        //ownerships = new HashSet<>();
     }
 
     public Long getCoinId() {
@@ -46,9 +46,9 @@ public class Coin {
         return value;
     }
 
-    public Set<CoinOwnership> getOwnerships() {
+    /*public Set<CoinOwnership> getOwnerships() {
         return ownerships;
-    }
+    }*/
 
     public void setCoinId(Long id) {
         this.coinId = id;
@@ -66,7 +66,7 @@ public class Coin {
         this.value = value;
     }
 
-    public void setOwnerships(Set<CoinOwnership> ownerships) {
+    /*public void setOwnerships(Set<CoinOwnership> ownerships) {
         this.ownerships = ownerships;
-    }
+    }*/
 }

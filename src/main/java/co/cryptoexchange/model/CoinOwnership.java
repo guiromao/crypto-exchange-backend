@@ -2,75 +2,77 @@ package co.cryptoexchange.model;
 
 import javax.persistence.*;
 
-@Entity
-@Table(name="coinownerships")
 public class CoinOwnership {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long ownershipId;
-
-    @ManyToOne
-    @JoinColumn(name="exchangeId")
-    private Exchange exchange;
-
-    @ManyToOne
-    @JoinColumn(name="coinId")
-    private Coin coin;
-
+    private String coinName;
+    private String coinCode;
+    private Double coinValue;
     private Double amount;
+    private Double valueStored;
 
     public CoinOwnership(){
 
     }
 
-    public CoinOwnership(Exchange exchange, Coin coin, Double amount){
-        this.exchange = exchange;
-        this.coin = coin;
+    public CoinOwnership(Coin coin, Double amount){
+        this.coinName = coin.getName();
+        this.coinCode = coin.getCode();
+        this.coinValue = coin.getValue();
         this.amount = amount;
+        valueStored = this.coinValue * this.amount;
     }
 
-    public CoinOwnership(Exchange exchange, Coin coin){
-        this.exchange = exchange;
-        this.coin = coin;
+    public CoinOwnership(Coin coin){
+        this.coinName = coin.getName();
+        this.coinCode = coin.getCode();
+        this.coinValue = coin.getValue();
         this.amount = 0d;
+        valueStored = this.coinValue * amount;
     }
 
-    public void addCoins(Double amount){
-        this.amount += amount;
+    @Override
+    public String toString(){
+        return coinCode + " | " + amount + " units | $" + (coinValue * amount);
     }
 
-    public void removeCoins(Double amount){
-        if(this.amount >= amount){
-            this.amount -= amount;
-        }
+    public String getName() {
+        return coinName;
     }
 
-    public Long getOwnershipId() {
-        return ownershipId;
+    public String getCoinCode() {
+        return coinCode;
     }
 
-    public Exchange getExchange() {
-        return exchange;
-    }
-
-    public Coin getCoin() {
-        return coin;
+    public Double getCoinValue() {
+        return coinValue;
     }
 
     public Double getAmount() {
         return amount;
     }
 
-    public void setOwnershipId(Long ownershipId) {
-        this.ownershipId = ownershipId;
+    public Double getValueStored() {
+        return valueStored;
     }
 
-    public void setCoin(Coin coin) {
-        this.coin = coin;
+    public void setCoinName(String coinName) {
+        this.coinName = coinName;
+    }
+
+    public void setCoinCode(String coinCode) {
+        this.coinCode = coinCode;
+    }
+
+    public void setCoinValue(Double value) {
+        this.coinValue = value;
     }
 
     public void setAmount(Double amount) {
         this.amount = amount;
     }
+
+    public void setValueStored(Double valueStored) {
+        this.valueStored = valueStored;
+    }
+    
 }

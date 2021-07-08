@@ -8,6 +8,10 @@ public interface CoinService {
 
     List<Coin> retrieveCoins();
 
-    Coin addCoin(Coin coin);
+    Coin saveCoin(Coin coin);
+
+    Coin getCoin(Long id);
+
+    void deleteCoin(Long id);
 
 }
