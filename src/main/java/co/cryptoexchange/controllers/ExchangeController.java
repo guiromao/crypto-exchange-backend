@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import co.cryptoexchange.services.ExchangeService;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping(path = {"/v1/api/exchanges/", "/v1/api/exchanges"})
@@ -29,6 +27,13 @@ public class ExchangeController {
         return new ResponseEntity<>(exchanges, HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Exchange> getExchange(@PathVariable Long id){
+        Exchange exchange = exchangeService.findById(id);
+
+        return new ResponseEntity<>(exchange, HttpStatus.OK);
+    }
+
     @PostMapping({"", "/"})
     public ResponseEntity createExchange(@RequestBody ExchangeDTO exchangeDto){
         Exchange exchange = ExchangeConverter.convertToExchange(exchangeDto);
@@ -40,6 +45,14 @@ public class ExchangeController {
     @PutMapping("/{id}/buy")
     public ResponseEntity buyCoins(@PathVariable Long id, @RequestParam String code, @RequestParam Double amount){
         ResponseEntity response = exchangeService.processCoinsBuy(id, code, amount) ?
+                new ResponseEntity(HttpStatus.OK) : new ResponseEntity(HttpStatus.BAD_REQUEST);
+
+        return response;
+    }
+
+    @PutMapping("/{id}/sell")
+    public ResponseEntity sellCoins(@PathVariable Long id, @RequestParam String code, @RequestParam Double amount){
+        ResponseEntity response = exchangeService.processCoinsSell(id, code, amount) ?
                 new ResponseEntity(HttpStatus.OK) : new ResponseEntity(HttpStatus.BAD_REQUEST);
 
         return response;

@@ -30,7 +30,7 @@ public class ExchangeServiceImpl implements ExchangeService {
 
     @Override
     public Exchange findById(Long id) {
-        return exchangeRepository.getById(id);
+        return exchangeRepository.findById(id).get();
     }
 
     @Override
@@ -49,6 +49,16 @@ public class ExchangeServiceImpl implements ExchangeService {
         Exchange exchange = exchangeRepository.getById(exchangeId);
         Coin coin = coinMapper.findCoin(code);
         boolean success = exchange.buyCoins(coin, amount);
+        exchangeRepository.saveAndFlush(exchange);
+
+        return success;
+    }
+
+    @Override
+    public boolean processCoinsSell(Long exchangeId, String code, Double amount) {
+        Exchange exchange = exchangeRepository.getById(exchangeId);
+        Coin coin = coinMapper.findCoin(code);
+        boolean success = exchange.sellCoins(coin, amount);
         exchangeRepository.saveAndFlush(exchange);
 
         return success;

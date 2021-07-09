@@ -20,6 +20,8 @@ public interface ExchangeService {
 
     boolean processCoinsBuy(Long exchangeId, String code, Double amount);
 
+    boolean processCoinsSell(Long exchangeId, String code, Double amount);
+
     List<CoinOwnership> retrieveCoins(Long exchangeId);
 
 }
