@@ -9,4 +9,8 @@ public class ExchangeConverter {
         return new Exchange(dto.getName(), dto.getLiquidity());
     }
 
+    public static ExchangeDTO convertToDTO(Exchange exchange){
+        return new ExchangeDTO(exchange.getName(), exchange.getLiquidity());
+    }
+
 }
