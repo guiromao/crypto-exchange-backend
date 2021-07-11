@@ -5,6 +5,7 @@ import co.cryptoexchange.model.CoinOwnership;
 import co.cryptoexchange.model.Exchange;
 import co.cryptoexchange.model.converters.ExchangeConverter;
 import co.cryptoexchange.model.dto.ExchangeDTO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,18 @@ public class ExchangeController {
         exchangeService.saveExchange(exchange);
 
         return new ResponseEntity(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity updateExchange(@PathVariable Long id, @RequestBody ExchangeDTO dto){
+        Exchange existingExchange = exchangeService.findById(id);
+
+        existingExchange.setName(dto.getName());
+        existingExchange.setLiquidity(dto.getLiquidity());
+
+        exchangeService.saveExchange(existingExchange);
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PutMapping("/{id}/buy")

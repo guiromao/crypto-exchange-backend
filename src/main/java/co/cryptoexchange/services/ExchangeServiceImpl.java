@@ -3,25 +3,33 @@ package co.cryptoexchange.services;
 import co.cryptoexchange.data.CoinRepository;
 import co.cryptoexchange.data.ExchangeRepository;
 import co.cryptoexchange.mappers.CoinMapper;
+import co.cryptoexchange.mappers.SystemMapper;
 import co.cryptoexchange.model.Coin;
 import co.cryptoexchange.model.CoinOwnership;
+import co.cryptoexchange.model.DistributedSystem;
 import co.cryptoexchange.model.Exchange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ExchangeServiceImpl implements ExchangeService {
+
+    private final String BUY = "Buy";
+    private final String SELL = "Sell";
 
     @Autowired
     private ExchangeRepository exchangeRepository;
 
     @Autowired
+    private DistributedSystemService dsService;
+
+    @Autowired
     private CoinMapper coinMapper;
+
+    @Autowired
+    private SystemMapper systemMapper;
 
     @Override
     public List<Exchange> findAll() {
@@ -47,21 +55,43 @@ public class ExchangeServiceImpl implements ExchangeService {
     @Override
     public boolean processCoinsBuy(Long exchangeId, String code, Double amount) {
         Exchange exchange = exchangeRepository.getById(exchangeId);
-        Coin coin = coinMapper.findCoin(code);
-        boolean success = exchange.buyCoins(coin, amount);
-        exchangeRepository.saveAndFlush(exchange);
+        Optional<DistributedSystem> ds = dsService.getSystem();
 
-        return success;
+        if(ds.isPresent()){
+            Coin coin = coinMapper.findCoin(code);
+            boolean success = exchange.buyCoins(ds.get(), coin, amount);
+            exchangeRepository.saveAndFlush(exchange);
+            dsService.save(ds.get());
+
+            if(success){
+                updateSystem(ds.get(), code, amount, BUY);
+            }
+
+            return success;
+        }
+
+        return false;
     }
 
     @Override
     public boolean processCoinsSell(Long exchangeId, String code, Double amount) {
         Exchange exchange = exchangeRepository.getById(exchangeId);
-        Coin coin = coinMapper.findCoin(code);
-        boolean success = exchange.sellCoins(coin, amount);
-        exchangeRepository.saveAndFlush(exchange);
+        Optional<DistributedSystem> distSystem = dsService.getSystem();
 
-        return success;
+        if(distSystem.isPresent()){
+            Coin coin = coinMapper.findCoin(code);
+            boolean success = exchange.sellCoins(distSystem.get(), coin, amount);
+            exchangeRepository.saveAndFlush(exchange);
+            dsService.save(distSystem.get());
+
+            if(success){
+                updateSystem(distSystem.get(), code, amount, SELL);
+            }
+
+            return success;
+        }
+
+        return false;
     }
 
     @Override
@@ -76,6 +106,26 @@ public class ExchangeServiceImpl implements ExchangeService {
         }
 
         return coins;
+    }
+
+    private void updateSystem(DistributedSystem ds, String code, Double amount, String dynamic){
+        Double value;
+
+        if(dynamic.equals(BUY)){
+            amount = 0 - amount;
+        }
+
+        switch(code){
+            case "BTC":
+                value = ds.getBtcSupply() + amount;
+                systemMapper.updateBtc(value);
+                break;
+
+            case "ADA":
+                value = ds.getAdaSupply() + amount;
+                systemMapper.updateAda(value);
+                break;
+        }
     }
 
 }

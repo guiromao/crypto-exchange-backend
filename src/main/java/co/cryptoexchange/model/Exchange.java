@@ -42,25 +42,25 @@ public class Exchange {
         coins = new HashMap<>();
     }
 
-    public synchronized boolean buyCoins(Coin c, Double numberCoins){
-        if(c != null){
+    public synchronized boolean buyCoins(DistributedSystem ds, Coin c, Double numberCoins){
+        if(c != null && ds != null){
             if(liquidity >= numberCoins * c.getValue()){
+                if(ds.hasEnoughTokens(c, numberCoins)){
+                    coins.putIfAbsent(c.getCode(), 0d);
+                    Double currAmount = coins.get(c.getCode());
+                    coins.put(c.getCode(), currAmount + numberCoins);
+                    liquidity -= (numberCoins * c.getValue());
 
-                coins.putIfAbsent(c.getCode(), 0d);
-
-                Double currAmount = coins.get(c.getCode());
-                coins.put(c.getCode(), currAmount + numberCoins);
-                liquidity -= (numberCoins * c.getValue());
-
-                return true;
+                    return true;
+                }
             }
         }
 
         return false;
     }
 
-    public synchronized boolean sellCoins(Coin c, Double numberCoins){
-        if(c != null){
+    public synchronized boolean sellCoins(DistributedSystem ds, Coin c, Double numberCoins){
+        if(c != null && ds != null){
             String code = c.getCode();
 
             if(coins.get(code) != null){
@@ -70,6 +70,7 @@ public class Exchange {
                     currAmount -= numberCoins;
                     coins.put(code, currAmount);
                     liquidity += c.getValue() * numberCoins;
+                    ds.addCoins(c, numberCoins);
 
                     return true;
                 }
